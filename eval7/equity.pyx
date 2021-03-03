@@ -182,6 +182,71 @@ def py_equities_2hands(hand1, hand2, start_board):
     return eq1, 1-eq1
 
 
+def py_outcome_breakdown_3hands(hand1, hand2, hand3, start_board):
+    all_cards = list(hand1) + list(hand2) + list(hand3)
+    case111 = 0
+    case113 = 0
+    case131 = 0
+    case122 = 0
+    case123 = 0
+    case132 = 0
+    case212 = 0
+    case221 = 0
+    case213 = 0
+    case231 = 0
+    case311 = 0
+    case312 = 0
+    case321 = 0
+    count = 0
+    for board in all_boards(all_cards, start_board):
+        h1 = evaluate(hand1+start_board+board)
+        h2 = evaluate(hand2+start_board+board)
+        h3 = evaluate(hand3+start_board+board)
+        if h1 > h2 and h1 > h3 and h2 > h3:
+            case123 += 1
+        elif h1 > h2 and h1 > h3 and h3 > h2:
+            case132 += 1
+        elif h2 > h1 and h2 > h3 and h1 > h3:
+            case213 += 1
+        elif h3 > h1 and h3 > h2 and h1 > h2:
+            case231 += 1
+        elif h2 > h1 and h2 > h3 and h3 > h1:
+            case312 += 1
+        elif h3 > h1 and h3 > h2 and h2 > h1:
+            case321 += 1
+        elif h1 == h2 and h1 == h3 and h3 == h2:
+            case111 += 1
+        elif h1 == h2 and h1 > h3 and h2 > h3:
+            case113 += 1
+        elif h1 > h2 and h1 > h3 and h2 == h3:
+            case122 += 1
+        elif h2 > h1 and h2 > h3 and h1 == h3:
+            case212 += 1
+        elif h3 > h1 and h3 > h2 and h1 == h2:
+            case221 += 1
+        elif h2 > h1 and h3 > h1 and h2 == h3:
+            case311 += 1
+        elif h2 > h1 and h3 > h1 and h2 == h3:
+            case311 += 1
+        count += 1
+    result = {
+        '111': case111/count,
+        '113': case113/count,
+        '131': case131/count,
+        '122': case122/count,
+        '123': case123/count,
+        '132': case132/count,
+        '212': case212/count,
+        '221': case221/count,
+        '213': case213/count,
+        '231': case231/count,
+        '311': case311/count,
+        '312': case312/count,
+        '321': case321/count,
+    }
+    return result
+
+
 def py_equities_3hands(hand1, hand2, hand3, start_board):
     all_cards = list(hand1) + list(hand2) + list(hand3)
     win1 = 0

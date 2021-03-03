@@ -240,3 +240,25 @@ class TestEquity(unittest.TestCase):
             self.assertAlmostEqual(equities[2], expected_equity[2], places=4)
             self.assertAlmostEqual(equities[3], expected_equity[3], places=4)
             self.assertAlmostEqual(equities[4], expected_equity[4], places=4)
+
+    def test_outcome_breakdown_3hands(self):
+
+        cases = (
+            ("Ac Ah", "7d 2c", "Kd Kh", "", [0.7141, 0.1037, 0.1822]),
+            ("Ac Ah", "7d 2c", "Kd Kh", "7c 5h 2h", [0.3023, 0.6102, 0.0875])
+        )
+        for hand1, hand2, hand3, board_strs, expected_equity in cases:
+            breakdown = eval7.equity.py_outcome_breakdown_3hands(
+                str_to_cards(hand1),
+                str_to_cards(hand2),
+                str_to_cards(hand3),
+                str_to_cards(board_strs)
+            )
+            total = sum(list(breakdown.values()))
+
+            self.assertEqual(total, 1)
+
+            eq1 = breakdown['123'] + breakdown['132'] + breakdown['122'] \
+                + breakdown['111'] / 3 + (breakdown['113'] + breakdown['131']) / 2
+            self.assertAlmostEqual(eq1, expected_equity[0], places=4)
+
