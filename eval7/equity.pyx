@@ -181,6 +181,37 @@ def py_equities_2hands(hand1, hand2, start_board):
     eq1 = (win + 0.5 * tie) / count
     return eq1, 1-eq1
 
+def py_outcome_breakdown(start_board, *hands):
+    if len(hands) == 2:
+        return py_outcome_breakdown_2hands(*hands, start_board)
+    elif len(hands) == 3:
+        return py_outcome_breakdown_3hands(*hands, start_board)
+    else:
+        raise RuntimeError('py_outcome_breakdown: invalid parameters')
+
+def py_outcome_breakdown_2hands(hand1, hand2, start_board):
+    all_cards = list(hand1) + list(hand2)
+    case11 = 0
+    case12 = 0
+    case21 = 0
+    count = 0
+    for board in all_boards(all_cards, start_board):
+        h1 = evaluate(hand1+start_board+board)
+        h2 = evaluate(hand2+start_board+board)
+        if h1 > h2:
+            case12 += 1
+        elif h2 > h1:
+            case21 += 1
+        else:
+            case11 += 1
+        count += 1
+    result = {
+        '11': case11/count,
+        '12': case12/count,
+        '21': case21/count,
+    }
+    return result
+
 
 def py_outcome_breakdown_3hands(hand1, hand2, hand3, start_board):
     all_cards = list(hand1) + list(hand2) + list(hand3)
