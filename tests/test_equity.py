@@ -12,122 +12,7 @@ def str_to_cards(hand_str):
     cards = tuple(map(eval7.Card, hand_str.split()))
     return cards
 
-
-def equities_2hands(hand1, hand2, start_board):
-    all_cards = list(hand1) + list(hand2)
-    all_boards = eval7.cards.all_boards(all_cards, start_board)
-    win = 0
-    tie = 0
-    count = 0
-    for board in all_boards:
-        h1 = eval7.evaluate(hand1+start_board+board)
-        h2 = eval7.evaluate(hand2+start_board+board)
-        if h1 > h2:
-            win += 1
-        elif h1 == h2:
-            tie += 1
-        count += 1
-    eq1 = (win + 0.5 * tie) / count
-    return eq1, 1-eq1
-
-
-def equities_3hands(hand1, hand2, hand3, start_board):
-    all_cards = list(hand1) + list(hand2) + list(hand3)
-    all_boards = eval7.cards.all_boards(all_cards, start_board)
-    win1 = 0
-    win2 = 0
-    win3 = 0
-    tie = 0
-    count = 0
-    for board in all_boards:
-        h1 = eval7.evaluate(hand1+start_board+board)
-        h2 = eval7.evaluate(hand2+start_board+board)
-        h3 = eval7.evaluate(hand3+start_board+board)
-        if h1 > h2 and h1 > h3:
-            win1 += 1
-        elif h1 == h2 and h1 == h3:
-            tie += 1
-        elif h2 > h1 and h2 > h3:
-            win2 += 1
-        else:
-            win3 += 1
-        count += 1
-    tie = tie / 3
-    eq1 = (win1 + tie) / count
-    eq2 = (win2 + tie) / count
-    eq3 = (win3 + tie) / count
-    return eq1, eq2, eq3
-
-
-def equities_4hands(hand1, hand2, hand3, hand4, start_board):
-    all_cards = list(hand1) + list(hand2) + list(hand3) + list(hand4)
-    all_boards = eval7.cards.all_boards(all_cards, start_board)
-    win1 = 0
-    win2 = 0
-    win3 = 0
-    win4 = 0
-    tie = 0
-    count = 0
-    for board in all_boards:
-        h1 = eval7.evaluate(hand1+start_board+board)
-        h2 = eval7.evaluate(hand2+start_board+board)
-        h3 = eval7.evaluate(hand3+start_board+board)
-        h4 = eval7.evaluate(hand4+start_board+board)
-        if h1 > h2 and h1 > h3 and h1 > h4:
-            win1 += 1
-        elif h1 == h2 and h1 == h3 and h1 == h4:
-            tie += 1
-        elif h2 > h1 and h2 > h3 and h2 > h4:
-            win2 += 1
-        elif h3 > h1 and h3 > h2 and h3 > h4:
-            win3 += 1
-        else:
-            win4 += 1
-        count += 1
-    tie = tie / 4
-    eq1 = (win1 + tie) / count
-    eq2 = (win2 + tie) / count
-    eq3 = (win3 + tie) / count
-    eq4 = (win4 + tie) / count
-    return eq1, eq2, eq3, eq4
-
-
-def equities_5hands(hand1, hand2, hand3, hand4, hand5, start_board):
-    all_cards = list(hand1) + list(hand2) + list(hand3) + list(hand4) + list(hand5)
-    all_boards = eval7.cards.all_boards(all_cards, start_board)
-    win1 = 0
-    win2 = 0
-    win3 = 0
-    win4 = 0
-    win5 = 0
-    tie = 0
-    count = 0
-    for board in all_boards:
-        h1 = eval7.evaluate(hand1+start_board+board)
-        h2 = eval7.evaluate(hand2+start_board+board)
-        h3 = eval7.evaluate(hand3+start_board+board)
-        h4 = eval7.evaluate(hand4+start_board+board)
-        h5 = eval7.evaluate(hand5+start_board+board)
-        if h1 > h2 and h1 > h3 and h1 > h4 and h1 > h5:
-            win1 += 1
-        elif h1 == h2 and h1 == h3 and h1 == h4 and h1 == h5:
-            tie += 1
-        elif h2 > h1 and h2 > h3 and h2 > h4 and h2 > h5:
-            win2 += 1
-        elif h3 > h1 and h3 > h2 and h3 > h4 and h3 > h5:
-            win3 += 1
-        elif h4 > h1 and h4 > h2 and h4 > h3 and h4 > h5:
-            win4 += 1
-        else:
-            win5 += 1
-        count += 1
-    tie = tie / 5
-    eq1 = (win1 + tie) / count
-    eq2 = (win2 + tie) / count
-    eq3 = (win3 + tie) / count
-    eq4 = (win4 + tie) / count
-    eq5 = (win5 + tie) / count
-    return eq1, eq2, eq3, eq4, eq5
+NO_BOARD = str_to_cards('')
 
 
 class TestEquity(unittest.TestCase):
@@ -240,3 +125,48 @@ class TestEquity(unittest.TestCase):
             self.assertAlmostEqual(equities[2], expected_equity[2], places=4)
             self.assertAlmostEqual(equities[3], expected_equity[3], places=4)
             self.assertAlmostEqual(equities[4], expected_equity[4], places=4)
+
+    def test_outcome_breakdown_3hands(self):
+
+        cases = (
+            ("3h Ah", "Qh Jc", "Kc Js", "", [0.5038, 0.1037, 0.1822]),
+            ("Ac Ah", "7d 2c", "Kd Kh", "", [0.7141, 0.1037, 0.1822]),
+            ("Ac Ah", "7d 2c", "Kd Kh", "7c 5h 2h", [0.3023, 0.6102, 0.0875])
+        )
+        for hand1, hand2, hand3, board_strs, expected_equity in cases:
+            breakdown = eval7.py_outcome_breakdown(
+                str_to_cards(board_strs),
+                str_to_cards(hand1),
+                str_to_cards(hand2),
+                str_to_cards(hand3),
+            )
+            total = sum(list(breakdown.values()))
+
+            self.assertEqual(total, 1)
+
+            eq1 = breakdown['123'] + breakdown['132'] + breakdown['122'] \
+                + breakdown['111'] / 3 + (breakdown['113'] + breakdown['131']) / 2
+            self.assertAlmostEqual(eq1, expected_equity[0], places=4)
+
+    def test_outcome_breakdown_2hands(self):
+
+        cases = (
+            ("3h Ah", "Qh Jc", "", 0.5795, 0.4152, 0.0054),
+            ("Ac Ah", "7d 2c", "", 0.8799, 0.1161, 0.004),
+            ("Kh Js", "Kd 9h", "", 0.6961, 0.2275, 0.0764),
+            ("Ac Ah", "Kd Kh", "7c 5h 2h", 0.9162, 0.0838, 0.0)
+        )
+        for hand1, hand2, board_strs, h1, h2, t in cases:
+            breakdown = eval7.py_outcome_breakdown(
+                str_to_cards(board_strs),
+                str_to_cards(hand1),
+                str_to_cards(hand2),
+            )
+            total = sum(list(breakdown.values()))
+
+            self.assertEqual(total, 1)
+
+            self.assertAlmostEqual(breakdown['12'], h1, places=3)
+            self.assertAlmostEqual(breakdown['21'], h2, places=3)
+            self.assertAlmostEqual(breakdown['11'], t, places=3)
+
